@@ -3,59 +3,98 @@ library(repmis)
 source_data("https://github.com/hllinas/DatosPublicos/blob/main/hsbdemo.Rdata?raw=false")
 Datos <- hsbdemo
 attach(Datos)
-names(Datos)
-
-Datos <- Datos[c("prog", "gender", "ses")]
-
-data <- data.frame(Y=c(1,2,2,3,1,1,1,2,2,3,3),
-                   X1=c(30,30,30,30,30,69,69,69,69,69,69),
-                   X2=c(20,20,20,20,20,55,55,55,55,55,55))
 
 glsm <- function(formula, data) {
   xdata <- data
   mf <- model.frame(formula = formula, data = xdata)
   
+  n_data <- as.data.frame(mf)
+  lvs <- levels(as.factor(n_data[[1]]))
+  rw <- nrow(n_data)
+  means <- list()
+  
+  for (i in lvs){
+    n_data[paste0("u_", i)] <- ifelse(n_data[, 1] == i, 1, 0)
+  }
+  
+  # -----------------------------------------
+  #                Null model
+  #------------------------------------------
+  
+  means_u <- colMeans(n_data[, grepl("^u_", names(n_data))])
+  p_u <- means_u
+  l <- list()
+  
+  for(i in 1:length(means_u)){
+    l[[i]] <- means_u[i] * log(p_u[i])
+  }
+  
+  l <- rw * sum(unlist(l))
+  dev_l <- -2 * l
+  e_l <- exp(l)
+  
+  nulo <- list(UBarra = means_u, P_u = p_u, LogNulo = l, DevNulo = dev_l, LNulo = e_l)
+  
+  # -----------------------------------------
+  #             Complete model
+  #------------------------------------------
+  
+  l <- list()
+  
+  for(i in 1:length(lvs)){
+    u <- n_data[, grepl("^u_", names(n_data))][i]
+    l[[i]] <- ifelse(u == 0, 0, u * log(u))
+  }
+  
+  l <- sum(unlist(l), na.rm = T)
+  dev_l <- -2*l
+  e_l <- exp(l)
+  
+  completo <- list(LogCompleto = l, DevCompleto = dev_l, LCompleto = e_l)
+  
+  # -----------------------------------------
+  #             Saturated model
+  #------------------------------------------
+  
   ff <- count(data, vars = c(names(mf)[-1]))
   names(ff)[ncol(ff)] <- c("n")
+  J <- nrow(ff)
   
-  aa <- split(xdata,xdata[,names(mf)[1]])
+  aa <- split(mf,mf[,names(mf)[1]])
   bb <- lapply(aa, function(x) count(x, vars = c(colnames(x)[-1])))
   
   for (i in 1:length(bb)) {
-    names(bb[[i]])[ncol(bb[[i]])] <- c("zj")
+    names(bb[[i]])[ncol(bb[[i]])] <- c(paste0("z_", names(bb[i]), "_j"))
   }
   
-  # Saturated model
-  cc <- lapply(bb, function(x) {
-    pj <- x$zj / ff$n
-    data.frame(x, pj = pj)
-  })
+  for(i in 1:length(bb)) {
+    bb[[i]] <- join(bb[[i]], ff, by = names(mf)[-1])
+    bb[[i]][paste0("p_", names(bb[i]), "_j")] <- bb[[i]][paste0("z_", names(bb[i]), "_j")]/bb[[i]]["n"]
+  }
   
-  lp <- lapply(cc, function(df) {
-    l <- 0
-    p <- 1
-    n <- nrow(df)
-    
-    for (j in df$zj) {
-      l <- ifelse(
-        j == 0 | j == n,
-        0,
-        l + j * log(df$pj[p])
-      )
-      p <- p + 1
-    }
-    
-    l = l + ifelse(sum(df$pj) >= 1, 0, ((n - sum(df$zj)) * log(1 - sum(df$pj))))
-    return(l)
-  })
-
-  l_saturado <- sum(unlist(lp))
+  tb <- as.data.frame(bb[[1]])
+  tb <- tb[, c(1:(ncol(tb) - 3), ncol(tb) - 1, ncol(tb) - 2, ncol(tb))]
   
-  saturado <- list(tabla = cc, poblaciones = ff, l_saturado = l_saturado)
+  for(i in bb[-1]){
+    tb <- join(tb, i, by = c(names(mf)[-1], "n"), type = "full")
+  }
   
+  tb[is.na(tb)] <- 0
+  nc <- length(names(mf)[-1]) + 2
+  pos <- 0
+  l <- list()
   
-  return(list(saturado = saturado))
+  for (i in 1:(length(bb))){
+    l[[i]] <- ifelse(tb[nc + pos + 1]  == 0 | tb[nc + pos] == 0, 0, tb[nc + pos] * log(tb[nc + pos + 1]))
+    pos = pos + 2
+  }
+  
+  l <- sum(unlist(l), na.rm = T)/J
+  dev_l <- -2 * l
+  e_l <- exp(l)
+  saturado <- list(tabla = tb, niveles = bb, poblaciones = ff, no_poblaciones = J, LogSaturado = l, DevSaturado = dev_l, LSaturado = e_l)
+  
+  return(list(data = n_data, ModeloCompleto = completo, ModeloNulo = nulo, ModeloSaturado = saturado))
 }
 
-m <- glsm(prog ~ gender + ses, data = Datos)
-m
+m <- glsm(prog ~ ses + write, data = Datos)

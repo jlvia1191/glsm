@@ -82,14 +82,25 @@ glsm <- function(formula, data) {
   tb[is.na(tb)] <- 0
   nc <- length(names(mf)[-1]) + 2
   pos <- 0
-  l <- list()
+  l <- numeric(length(bb))
   
-  for (i in 1:(length(bb))){
-    l[[i]] <- ifelse(tb[nc + pos + 1]  == 0 | tb[nc + pos] == 0, 0, tb[nc + pos] * log(tb[nc + pos + 1]))
-    pos = pos + 2
+  tb <- as.data.frame(tb)
+  
+  for (i in 1:(length(bb))) {
+    tb[paste0("l_", names(bb[i]))] <- ifelse(tb[, nc + pos + 1] == 0 | tb[, nc + pos] == 0, 0, tb[, nc + pos] * log(tb[, nc + pos + 1]))
+    pos <- pos + 2
   }
   
-  l <- sum(unlist(l), na.rm = T)/J
+  tb["Lp"] <- apply(tb[, grep("^l_", names(tb))], 1, function(x) {
+    if(0 %in% x){
+      return(0)
+    } else{
+      return(sum(x))
+    }
+  })
+  
+  tb <- tb[, -grep("^l_", names(tb))]
+  l <- sum(tb$Lp)
   dev_l <- -2 * l
   e_l <- exp(l)
   saturado <- list(tabla = tb, niveles = bb, poblaciones = ff, no_poblaciones = J, LogSaturado = l, DevSaturado = dev_l, LSaturado = e_l)
@@ -97,4 +108,4 @@ glsm <- function(formula, data) {
   return(list(data = n_data, ModeloCompleto = completo, ModeloNulo = nulo, ModeloSaturado = saturado))
 }
 
-m <- glsm(prog ~ ses + write, data = Datos)
+m <- glsm(prog ~ gender + read, data = Datos)

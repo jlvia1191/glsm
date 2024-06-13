@@ -1,14 +1,22 @@
 library(plyr)
 library(repmis)
+library(VGAM)
+
 source_data("https://github.com/hllinas/DatosPublicos/blob/main/hsbdemo.Rdata?raw=false")
 Datos <- hsbdemo
 attach(Datos)
 
-glsm <- function(formula, data) {
+glsm <- function(formula, data, ref = NaN) {
   xdata <- data
   mf <- model.frame(formula = formula, data = xdata)
   
+  predictors <- colnames(mf)[-1]
+  
   n_data <- as.data.frame(mf)
+  if (unique(n_data[1]) < 3) {
+    stop("The dependent variable must have 3 or more levels.\n\nIf you are trying to perform a dichotomous logistic regression model,\nI recommend using the lsm() function from the package of the same name.")
+  }
+  
   lvs <- levels(as.factor(n_data[[1]]))
   rw <- nrow(n_data)
   means <- list()
@@ -22,7 +30,9 @@ glsm <- function(formula, data) {
   #------------------------------------------
   
   means_u <- colMeans(n_data[, grepl("^u_", names(n_data))])
+  
   p_u <- means_u
+  
   l <- list()
   
   for(i in 1:length(means_u)){
@@ -30,10 +40,7 @@ glsm <- function(formula, data) {
   }
   
   l <- rw * sum(unlist(l))
-  dev_l <- -2 * l
-  e_l <- exp(l)
-  
-  nulo <- list(UBarra = means_u, P_u = p_u, LogNulo = l, DevNulo = dev_l, LNulo = e_l)
+  Log_Lik_Null <- l
   
   # -----------------------------------------
   #             Complete model
@@ -47,10 +54,7 @@ glsm <- function(formula, data) {
   }
   
   l <- sum(unlist(l), na.rm = T)
-  dev_l <- -2*l
-  e_l <- exp(l)
-  
-  completo <- list(LogCompleto = l, DevCompleto = dev_l, LCompleto = e_l)
+  Log_Lik_Complete <- l
   
   # -----------------------------------------
   #             Saturated model
@@ -100,12 +104,146 @@ glsm <- function(formula, data) {
   })
   
   tb <- tb[, -grep("^l_", names(tb))]
-  l <- sum(tb$Lp)
-  dev_l <- -2 * l
-  e_l <- exp(l)
-  saturado <- list(tabla = tb, niveles = bb, poblaciones = ff, no_poblaciones = J, LogSaturado = l, DevSaturado = dev_l, LSaturado = e_l)
   
-  return(list(data = n_data, ModeloCompleto = completo, ModeloNulo = nulo, ModeloSaturado = saturado))
+  l <- sum(tb$Lp)
+  Log_Lik_Saturate <- l
+  
+  Populations <- J
+  Saturated_Table <- tb
+  Saturated_List <- bb
+  
+  z_rj <- tb[, grep("^z_", names(tb))]
+  nj <- tb[, 'n']
+  p_rj_tilde <- z_rj/nj
+  
+  names(p_rj_tilde) <- gsub("^z_", "p_", names(p_rj_tilde))
+  names(p_rj_tilde) <- paste0(names(p_rj_tilde), "_tilde")
+  # -----------------------------------------
+  #           Model parameters
+  #------------------------------------------
+  
+  lvs_t <- lvs[-match(ifelse(is.na(ref), lvs[1], ref), lvs)]
+  
+  formula_str <- as.formula(paste(as.character(formula)[-1], collapse = " ~ "))
+  ref_lvl <- match(ifelse(is.na(ref), lvs[1], ref), lvs)
+  
+  model <- vglm(
+    formula_str, 
+    multinomial(refLevel = ref_lvl), 
+    data = data
+  )
+  
+  Log_Lik_Logit <- -deviance(model)/2
+  
+  coef <- coef(model)
+  
+  for (i in seq_along(lvs_t)) {
+    names(coef) <- gsub(paste0(":", i), paste0(":", lvs_t[i]), names(coef))
+  }
+  
+  coefficients <- as.numeric(coef)
+  ExpB <- exp(coefficients)
+  
+  Std.Error <- sqrt(diag(vcov(model)))
+  
+  Wald <- (coefficients/Std.Error)^2
+  DF <- rep(1, length(coef))
+  P.value <- pchisq(Wald, DF, lower.tail = F)
+  
+  Dev_Null_vs_Logit <- 2 * (Log_Lik_Logit - Log_Lik_Null)
+  Dev_Logit_vs_Complete <- -2 * Log_Lik_Logit
+  Dev_Logit_vs_Saturate <- 2 * (Log_Lik_Saturate - Log_Lik_Logit)
+  
+  K <- length(lvs)
+  Df_Null_vs_Logit <- 2 * (1 + K) - 2
+  Df_Logit_vs_Complete <- 2 * (rw - (1 + K))
+  Df_Logit_vs_Saturate <- 2 * (J - (1 + K))
+  
+  P.v_Null_vs_Logit <- pchisq(Dev_Null_vs_Logit, Df_Null_vs_Logit, lower.tail = F)
+  P.v_Logit_vs_Complete <- pchisq(Dev_Logit_vs_Complete, Df_Logit_vs_Complete, lower.tail = F)
+  P.v_Logit_vs_Saturate <- pchisq(Dev_Logit_vs_Saturate, Df_Logit_vs_Saturate, lower.tail = F)
+  
+  p_rj <- predict(model, newdata = tb[predictors], type = 'response')
+  
+  p_ref <- p_rj[, which(colnames(p_rj) %in% lvs[ref_lvl])]
+  odd_p <- p_rj[, setdiff(colnames(p_rj), lvs[ref_lvl])]
+  odds <- odd_p / p_ref
+  
+  logit_p <- log(odds)
+  or <- exp(coef)
+  
+  colnames(p_rj) <- paste0("p_", lvs, "_j")
+  
+  ltb <- tb[predictors]
+  
+  ltb$n <- tb$n
+  ltb[colnames(tb[grepl("^z_", names(tb))])] <- tb[grepl("^z_", names(tb))]
+  ltb[colnames(p_rj)] <- p_rj
+  ltb[colnames(logit_p)] <- logit_p
+  
+  m_rj <- ltb[, 'n'] * ltb[, grepl("^p_", names(ltb))]
+  colnames(m_rj) <- paste0("m_", lvs, "_j")
+  
+  v_rj <- ltb[, grepl("^p_", names(ltb))] * (1 - ltb[, grepl("^p_", names(ltb))])
+  colnames(v_rj) <- paste0("v_", lvs, "_j")
+  ltb[colnames(v_rj)] <- v_rj
+  
+  V_rj <- ltb$n * v_rj
+  
+  S_p <- ((tb$n * (p_rj_tilde  - p_rj)))/v_rj
+  colnames(S_p) <- paste0("S_", lvs, "(p)")
+  
+  cov_m <- vcov(model)
+  
+  logi <- list(
+    data = n_data, 
+    coefficients = coefficients,
+    coef = coef,
+    Std.Error = Std.Error,
+    ExpB = ExpB,
+    Wald = as.numeric(Wald),
+    DF = DF,
+    P.value = as.numeric(P.value),
+    Log_Lik_Complete = Log_Lik_Complete, 
+    Log_Lik_Null = Log_Lik_Null, 
+    Log_Lik_Saturate = Log_Lik_Saturate,
+    Log_Lik_Logit = Log_Lik_Logit,
+    Populations = Populations,
+    Dev_Null_vs_Logit = Dev_Null_vs_Logit,
+    Dev_Logit_vs_Complete = Dev_Logit_vs_Complete,
+    Dev_Logit_vs_Saturate = Dev_Logit_vs_Saturate,
+    Df_Null_vs_Logit = Df_Null_vs_Logit,
+    Df_Logit_vs_Complete = Df_Logit_vs_Complete,
+    Df_Logit_vs_Saturate = Df_Logit_vs_Saturate,
+    P.v_Null_vs_Logit = P.v_Null_vs_Logit,
+    P.v_Logit_vs_Complete = P.v_Logit_vs_Complete,
+    P.v_Logit_vs_Saturate = P.v_Logit_vs_Saturate,
+    Logit_r = logit_p,
+    p_logit_complete = n_data[, grepl("^u_", names(n_data))],
+    p_hat_null = p_u,
+    p_rj = p_rj,
+    odd = odds,
+    OR = or,
+    z_rj = z_rj,
+    nj = nj,
+    p_rj_tilde = p_rj_tilde,
+    v_rj = v_rj,
+    m_rj = m_rj,
+    V_rj = V_rj,
+    V = cov(z_rj),
+    S_p = S_p,
+    I_p = cov(S_p),
+    Zast_j = scale(z_rj),
+    mcov = cov_m,
+    mcor = cov2cor(cov_m),
+    Esm = tb,
+    Elm = ltb,
+    call = match.call()
+  )
+  
+  class(logi) <- "glsm"
+  
+  return(logi)
 }
 
-m <- glsm(prog ~ gender + read, data = Datos)
+m <- glsm(prog ~ ses + write, data = Datos)

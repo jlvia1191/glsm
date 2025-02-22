@@ -1,0 +1,67 @@
+#' @export
+#' @exportS3Method glsm::summary
+#'
+#' @title  Summary Method for \code{glsm} Objects
+#'
+#' @description Provides a \code{summary} method for \code{glsm} objects.
+#'
+#' @param object The \code{glsm} model to summarize. The details of the model specification are provided under 'Details'.
+#' @param ... Other arguments passed to or from other methods.
+#'
+#' @return "summary.glsm" returns an object of class \code{summary.glsm}, a list with components:
+#' \item{Call}{The original call used to fit the model.}
+#' \item{coeff}{A matrix of coefficients with columns for the estimated coefficients (Coef(B)),
+#' standard errors (Std.Error), exponentiated coefficients (Exp(B)), Wald test statistics (Wald),
+#' degrees of freedom (DF), and the corresponding p-values (P.value).}
+#' \item{comparison test}{A matrix with comparison tests of the logistic model against the following models:
+#' Null, Complete, and Saturated. It includes the test statistic (Deviance), degrees of freedom (DF),
+#' and p-values (P.value).}
+#'
+#' @details The \code{glsm} object is an expression of the form \code{y ~ model},
+#' where \code{y} is the binary outcome variable (coded as 0 or 1), and \code{model}
+#' specifies the linear predictor for the logistic model. The model terms can include variables
+#' and factors, and interactions are denoted using the \code{:} operator. For more details on the
+#' model specification, please refer to the documentation of \code{lsm}.
+#'
+#' @references [1] Hosmer, D.W., Lemeshow, S. and Sturdivant, R.X. (2013). Applied Logistic Regression, 3rd ed., New York: Wiley.
+#' @references [2] LLinás, H. J. (2006). Precisiones en la teoría de los modelos logísticos. Revista Colombiana de Estadística, 29(2), 239–265. https://revistas.unal.edu.co/index.php/estad/article/view/29310
+#' @references [3] Llinás, H., & Carreño, C. (2012). The Multinomial Logistic Model for the Case in which the Response Variable Can Assume One of Three Levels and Related Models. Revista Colombiana de Estadística, 35(1), 131-138.
+#' @references [4] Orozco-Acosta, E., LLinás-Solano, H., & Fonseca-Rodríguez, J. (2020). Convergence theorems in multinomial saturated and logistic models. Revista Colombiana de Estadística, 43(2), 211-231.
+#' @references [5] Solano, H. L., Charris, M. A., & Hernández, J. T. (2016). El modelo de regresión logística para el caso en que la variable de respuesta puede asumir uno de tres niveles: estimaciones, pruebas de hipótesis y selección de modelos. Revista de Matemática: Teoría y Aplicaciones, 23(1), 173-197.
+#'
+#' @author Dr. rer. nat. Humberto LLinás Solano [aut] (Universidad del Norte, Barranquilla-Colombia);
+#' MSc. Omar Fábregas Cera [aut] (Universidad del Norte, Barranquilla-Colombia);
+#' MSc. Jorge Villalba Acevedo [cre, aut] (Universidad Tecnológica de Bolívar, Cartagena-Colombia).
+#'
+#' @examples
+#'  # Example usage:
+#'  # AGE <- c(20, 23, 24, 25, 25, 26, 26, 28, 28, 29, 30, 30, 30, 30, 30, 30, 30, 32, 33, 33)
+#'  # CHD <- c(0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
+#'  # data <- data.frame(CHD, AGE)
+#'  # Ela <- lsm(CHD ~ AGE, data)
+#'  # summary(Ela)
+#'
+summary.glsm <- function(object, ...){
+
+  TC <- cbind(object$coefficients, object$Std.Error, object$ExpB, object$Wald, object$DF, object$P.value)
+  colnames(TC) <- c("Coef(B)", "Std.Error", "Exp(B)", "Wald", "DF", "P.value")
+
+  TAB <- cbind(Deviance = c(object$Dev_Null_vs_Logit, object$Dev_Logit_vs_Complete, object$Dev_Logit_vs_Saturate),
+               DF = c(object$Df_Null_vs_Logit, object$Df_Logit_vs_Complete, object$Df_Logit_vs_Saturate),
+               P.value = c(object$P.v_Null_vs_Logit, object$P.v_Logit_vs_Complete, object$P.v_Logit_vs_Saturate))
+  row.names(TAB) <- c("Null vs Logit", "Logit vs Complete", "Logit vs Saturate")
+
+  res <- list(Call = object$call, `comparison test` = TAB, coeff = TC)
+  class(res) <- "summary.glsm"
+  return(res)
+}
+
+#' @export
+print.summary.glsm <- function(x, ...){
+  cat("\nCall:\n")
+  print(x$Call)
+  cat("\nCoefficients: \n")
+  printCoefmat(x$coeff, P.values = TRUE, has.Pvalue = TRUE)
+  cat("\nAnalysis of Deviance (Chi-squared): \n")
+  printCoefmat(x$`comparison test`, P.values = TRUE, has.Pvalue = TRUE)
+}

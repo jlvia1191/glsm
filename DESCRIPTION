@@ -1,11 +1,34 @@
 Package: glsm
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Estimation of the log Likelihood of the Saturated Model
+Version: 0.0.0.1
+Date: 2024-07-08
+Authors@R: c(
+  person("Jorge", "Villalba", email = "jvillalba@utb.edu.co", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2888-9660")),
+  person("Humberto", "Llinas", email = "hllinas@uninorte.edu.co", role = c("aut"), comment = c(ORCID = "0000-0002-2976-5109")),
+  person("Jorge", "Borja", email = "jborjaa@uninorte.edu.co", role = c("aut"), comment = c(ORCID = "0009-0006-4824-5199")),
+  person("Jorge", "Tilano", email = "jtilano@uninorte.edu.co", role = c("aut"), comment = c(ORCID = "0000-0001-6853-6280"))
+  )
+Author: Jorge Villalba [aut, cre] (<https://orcid.org/0000-0002-2888-9660>),
+  Humberto Llinas [aut] (<https://orcid.org/0000-0002-2976-5109>),
+  Jorge Borja [aut] (<https://orcid.org/   >)
+  Jorge Tilano [aut] (<https://orcid.org/   >)
+Maintainer: Jorge  Villalba <jvillalba@utb.edu.co>
+Description: When the values of the outcome variable Y are either 0 or 1,
+      the function lsm() calculates the estimation of the log likelihood 
+      in the saturated model. 
+      This model is characterized by Llinas (2006, ISSN:2389-8976) in section 2.3 
+      through the assumptions 1 and 2. 
+      The function LogLik() works (almost perfectly) when the number of independent
+      variables K is high, but for small K it calculates wrong values in some cases.
+      For this reason, when Y is dichotomous and the data are grouped in J populations,
+      it is recommended to use the function lsm() because it works very well for all K.
+Depends: R (>= 3.5.0)
+Imports: stats, dplyr (>= 1.0.0), ggplot2 (>= 1.0.0), VGAM, plyr
 Encoding: UTF-8
-LazyData: true
+License: MIT + file LICENSE
+RoxygenNote: 7.3.2
+NeedsCompilation: yes
+Repository: CRAN
+LazyLoad: yes
+

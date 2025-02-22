@@ -1,0 +1,32 @@
+citHeader("To cite lsm in publications please use:")
+
+## R (>= 3.5.0) passes package metadata to citation().
+
+if(!exists("meta") || is.null(meta)) meta <- packageDescription("lsm")
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+bibentry(bibtype= "Manual",
+         title = "{glsm}: Estimation of the log Likelihood of the Saturated Model",
+         author = c(person(c("Jorge", "L."), "Villalba"),
+                    person(c("Humberto", "J."), "Llinas"),
+                    person(c("Jorge", "A."), "Borja"),
+                    person(c("Jorge", "J."), "Tilana")),
+         year = year,
+         note = note,
+         key= "glsm-package",
+          textVersion =
+           paste("Jorge L. Villalba, Humberto J. Llinas,  Jorge A. Borja, Jorge J. Tilana",
+                 sprintf("(%s).", year),
+                 "glsm:  Estimation of the log Likelihood of the Saturated Model")
+)
+
+
+
+
+
+
+
+
+
+

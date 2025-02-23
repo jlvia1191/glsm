@@ -1,5 +1,22 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # `glsm()`
+
+<!-- badges: start -->
+<!-- badges: end -->
 
 
 Welcome to the *glsm* package!
@@ -7,47 +24,50 @@ Welcome to the *glsm* package!
 
 When the response variable \code{Y} takes one of R>1 values, the function \code{glsm()} calculates, among others, the values of the maximum likelihood estimates (ML-estimations) of the  corresponding parameters  in the null, complete, saturated and logistic models and also the estimations of the log likelihood in each of this models. The models null and complete are described by Llinas, Arteta and Tilano (2016, ISSN:2389-8976) in sections 2.2 and 2.3. The saturated model is characterized in section 3 by Orozco, Llinas and Fonseca (2020, ISSN:2389-8976) through the assumptions 1 and 2. Finally,  the logistic model and its assumptions are explained in section 5. Additionally, based on asymptotic theory for these ML-estimations and the score vector, the function \code{lsm()} calculates the values of the approximations for different deviations -2 log L, where L is the likelihood function. Based on these approximations, the function obtains the values of statistics for several hypothesis tests (each with an asymptotic chi-squared distribution): Null vs Logit, Logit vs Complete and Logit vs Saturated. With the function \code{glsm()}, it is possible calculate confidence intervals for the logistic parameters and for the corresponding odds ratio. The asymptotic theory was developed for the case of independent, non-identically distributed variables.  If \code{Y} is polychotomous and the data are grouped in \code{J} populations, it is recommended to use the function \code{lsm()} because it works very well for all \code{K}, the number of explanatory variables.
 
-Details
--------
+## Details
+
 
 The saturated model is characterized by the assumptions 1 and 2 presented in section 2.3 by Llinas (2006, ISSN:2389-8976).
 
 
-Installation
-------------
+## Installation
 
-```{r}
+You can install the development version of glsm like so:
+
+``` r
+# install.packages("devtools")
+devtools::install_guihub("jlvia1191/glsm")
+
 remotes::install_github("jlvia1191/glsm", force = TRUE)
-library(glsm)
 
 ```
 
+## Example Usage
 
+This is a basic example which shows you how to solve a common problem:
 
-Example Usage
--------------
-
-Hosmer, D. (2013) page 3: Age and coranary Heart Disease (CHD) Status of 20 subjects:
-
-
-```{r}
- library(glsm)
- library(repmis)
- source_data("https://github.com/hllinas/DatosPublicos/blob/main/hsbdemo.Rdata?raw=false")
- Datos <- hsbdemo
- modelo <- glsm(prog ~ ses + gender, data=Datos, ref = "academic")
- modelo
+```{r example}
+library(glsm)
+library(repmis)
+source_data("https://github.com/hllinas/DatosPublicos/blob/main/hsbdemo.Rdata?raw=false")
+Datos <- hsbdemo
+modelo <- glsm(prog ~ ses + gender, data=Datos, ref = "academic")
+modelo
 ```
 
 
 References
 ----------
 
-[1]  Humberto Jesus Llinas. (2006). Accuracies in the theory of the logistic models. Revista Colombiana De Estadistica,29(2), 242-244.
+[1] Hosmer, D.W., Lemeshow, S. and Sturdivant, R.X. (2013). Applied Logistic Regression, 3rd ed., New York: Wiley.
 
-[2]  Hosmer, D. (2013). Wiley Series in Probability and Statistics Ser. : Applied Logistic Regression (3). New York: John Wiley & Sons, Incorporated.
+[2] LLinás, H. J. (2006). Precisiones en la teoría de los modelos logísticos. Revista Colombiana de Estadística, 29(2), 239–265. https://revistas.unal.edu.co/index.php/estad/article/view/29310
 
-[3] Chambers, J. M. and Hastie, T. J. (1992) Statistical Models in S. Wadsworth & Brooks/Cole.
+[3] Llinás, H., & Carreño, C. (2012). The Multinomial Logistic Model for the Case in which the Response Variable Can Assume One of Three Levels and Related Models. Revista Colombiana de Estadística, 35(1), 131-138.
+
+[4] Orozco-Acosta, E., LLinás-Solano, H., & Fonseca-Rodríguez, J. (2020). Convergence theorems in multinomial saturated and logistic models. Revista Colombiana de Estadística, 43(2), 211-231.
+
+[5] Solano, H. L., Charris, M. A., & Hernández, J. T. (2016). El modelo de regresión logística para el caso en que la variable de respuesta puede asumir uno de tres niveles: estimaciones, pruebas de hipótesis y selección de modelos. Revista de Matemática: Teoría y Aplicaciones, 23(1), 173-197.
 
 
 Author(s)
@@ -59,3 +79,12 @@ Jorge Luis Villalba Acevedo [cre, aut], Universidad Tecnológica de Bolívar, Ca
 ----
 
 If you found any ERRORS or have SUGGESTIONS, please report them to my email. Thanks. 
+
+
+
+
+
+
+
+
+

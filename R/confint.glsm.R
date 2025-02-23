@@ -1,7 +1,7 @@
-#' confint Method for glsm
+#' Confint Method for glsm
 #'
 #' @title  Confidence Intervals for \code{glsm}  Objects
-#' @description Provides a confint method for \code{glsm}  objects.
+#' @description Provides a confint method for \code{glsm} objects.
 #'
 #' @param object The type of prediction required. The default is on the scale of the linear predictors. The alternative \code{response} gives the predicted probabilities.
 #' @param parm calculate confidence intervals for the coefficients
@@ -20,11 +20,18 @@
 #'
 #' @encoding UTF-8
 #' @details The saturated model is characterized by the assumptions 1 and 2 presented in section 2.3 by Llinas (2006, ISSN:2389-8976).
-#' @references [1] LLinás, H. J. (2006). Precisiones en la teoría de los modelos logísticos. Revista Colombiana de Estadística, 29(2), 239–265. https://revistas.unal.edu.co/index.php/estad/article/view/29310
-#' @references [2] Hosmer, D.W., Lemeshow, S. and Sturdivant, R.X. (2013). Applied Logistic Regression, 3rd ed., New York: Wiley.
-#' @references [3] Chambers, J. M. and Hastie, T. J. (1992). Statistical Models in S. Wadsworth & Brooks/Cole.
 #'
-#' @author Jorge Villalba Acevedo [cre, aut], (Universidad Tecnológica de Bolívar, Cartagena-Colombia).
+#' @references \code{[1]}  Hosmer, D.W., Lemeshow, S. and Sturdivant, R.X. (2013). Applied Logistic Regression, 3rd ed., New York: Wiley.
+#' @references \code{[2]} LLinás, H. J. (2006). Precisiones en la teoría de los modelos logísticos. Revista Colombiana de Estadística, 29(2), 239–265. https://revistas.unal.edu.co/index.php/estad/article/view/29310
+#' @references \code{[3]} Llinás, H., & Carreño, C. (2012). The Multinomial Logistic Model for the Case in which the Response Variable Can Assume One of Three Levels and Related Models. Revista Colombiana de Estadística, 35(1), 131-138.
+#' @references \code{[4]} Orozco-Acosta, E., LLinás-Solano, H., & Fonseca-Rodríguez, J. (2020). Convergence theorems in multinomial saturated and logistic models. Revista Colombiana de Estadística, 43(2), 211-231.
+#' @references \code{[5]} Solano, H. L., Charris, M. A., & Hernández, J. T. (2016). El modelo de regresión logística para el caso en que la variable de respuesta puede asumir uno de tres niveles: estimaciones, pruebas de hipótesis y selección de modelos. Revista de Matemática: Teoría y Aplicaciones, 23(1), 173-197.
+#'
+#' @author
+#' Jorge Villalba (Universidad Tecnológica de Bolívar, Cartagena-Colombia; autor y creador),
+#' Humberto Llinas (Universidad del Norte, Barranquilla-Colombia; autor),
+#' Jorge Borja (Universidad del Norte, Barranquilla-Colombia; autor),
+#' Jorge Tilano (Universidad del Norte, Barranquilla-Colombia; autor).
 #'
 #' @examples
 #'
@@ -36,8 +43,7 @@
 #' #Ejemplo de uso de una función en el paquete `glsm`
 #' # model <- glsm(CHD ~ AGE, data = data)
 #' # summary(model)
-
-
+#'
 #' @export
 #' @exportS3Method confint glsm
 #'

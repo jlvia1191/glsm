@@ -41,18 +41,19 @@ model specification, please refer to the documentation of \code{lsm}.
 
 }
 \references{
-[1] Hosmer, D.W., Lemeshow, S. and Sturdivant, R.X. (2013). Applied Logistic Regression, 3rd ed., New York: Wiley.
+\code{[1]}  Hosmer, D.W., Lemeshow, S. and Sturdivant, R.X. (2013). Applied Logistic Regression, 3rd ed., New York: Wiley.
 
-[2] LLinás, H. J. (2006). Precisiones en la teoría de los modelos logísticos. Revista Colombiana de Estadística, 29(2), 239–265. https://revistas.unal.edu.co/index.php/estad/article/view/29310
+\code{[2]} LLinás, H. J. (2006). Precisiones en la teoría de los modelos logísticos. Revista Colombiana de Estadística, 29(2), 239–265. https://revistas.unal.edu.co/index.php/estad/article/view/29310
 
-[3] Llinás, H., & Carreño, C. (2012). The Multinomial Logistic Model for the Case in which the Response Variable Can Assume One of Three Levels and Related Models. Revista Colombiana de Estadística, 35(1), 131-138.
+\code{[3]} Llinás, H., & Carreño, C. (2012). The Multinomial Logistic Model for the Case in which the Response Variable Can Assume One of Three Levels and Related Models. Revista Colombiana de Estadística, 35(1), 131-138.
 
-[4] Orozco-Acosta, E., LLinás-Solano, H., & Fonseca-Rodríguez, J. (2020). Convergence theorems in multinomial saturated and logistic models. Revista Colombiana de Estadística, 43(2), 211-231.
+\code{[4]} Orozco-Acosta, E., LLinás-Solano, H., & Fonseca-Rodríguez, J. (2020). Convergence theorems in multinomial saturated and logistic models. Revista Colombiana de Estadística, 43(2), 211-231.
 
-[5] Solano, H. L., Charris, M. A., & Hernández, J. T. (2016). El modelo de regresión logística para el caso en que la variable de respuesta puede asumir uno de tres niveles: estimaciones, pruebas de hipótesis y selección de modelos. Revista de Matemática: Teoría y Aplicaciones, 23(1), 173-197.
+\code{[5]} Solano, H. L., Charris, M. A., & Hernández, J. T. (2016). El modelo de regresión logística para el caso en que la variable de respuesta puede asumir uno de tres niveles: estimaciones, pruebas de hipótesis y selección de modelos. Revista de Matemática: Teoría y Aplicaciones, 23(1), 173-197.
 }
 \author{
-Dr. rer. nat. Humberto LLinás Solano [aut] (Universidad del Norte, Barranquilla-Colombia);
-MSc. Omar Fábregas Cera [aut] (Universidad del Norte, Barranquilla-Colombia);
-MSc. Jorge Villalba Acevedo [cre, aut] (Universidad Tecnológica de Bolívar, Cartagena-Colombia).
+Jorge Villalba (Universidad Tecnológica de Bolívar, Cartagena-Colombia; autor y creador),
+Humberto Llinas (Universidad del Norte, Barranquilla-Colombia; autor),
+Jorge Borja (Universidad del Norte, Barranquilla-Colombia; autor),
+Jorge Tilano (Universidad del Norte, Barranquilla-Colombia; autor).
 }

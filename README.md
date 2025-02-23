@@ -4,6 +4,8 @@
 # `glsm()`
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/jlvia1191/glsm/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jlvia1191/glsm/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 # Welcome to the *glsm* package!
@@ -45,7 +47,7 @@ You can install the development version of glsm like so:
 
 remotes::install_github("jlvia1191/glsm", force = TRUE)
 
-devtools::install_guihub("jlvia1191/glsm", force = TRUE)
+devtools::install_github("jlvia1191/glsm", force = TRUE)
 
 ```
 

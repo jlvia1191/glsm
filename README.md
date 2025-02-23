@@ -42,9 +42,11 @@ You can install the development version of glsm like so:
 
 ``` r
 # install.packages("devtools")
-devtools::install_guihub("jlvia1191/glsm")
 
 remotes::install_github("jlvia1191/glsm", force = TRUE)
+
+devtools::install_guihub("jlvia1191/glsm", force = TRUE)
+
 ```
 
 ## Example Usage

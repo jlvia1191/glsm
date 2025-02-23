@@ -1,7 +1,7 @@
 Package: glsm
 Type: Package
 Title: Estimation of the log Likelihood of the Saturated Model when the response variable Y takes one of R > 1 values
-Version: 0.0.0.1
+Version: 0.0.0.2
 Date: 2025-02-28
 Authors@R: c(
   person("Jorge", "Villalba", email = "jvillalba@utb.edu.co", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2888-9660")),

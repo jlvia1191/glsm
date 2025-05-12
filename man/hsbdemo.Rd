@@ -3,7 +3,7 @@
 \docType{data}
 \name{hsbdemo}
 \alias{hsbdemo}
-\title{World Health Organization TB data}
+\title{hsbdemo: School data for testing.}
 \format{
 A data frame with 200 rows and 17 columns:
 \describe{

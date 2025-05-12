@@ -1,4 +1,4 @@
-#' World Health Organization TB data
+#' hsbdemo: School data for testing.
 #'
 #' Entering high school students make program choices among general program, vocational program and academic program. Their choice might be modeled using their writing score and their social economic status.The data set contains variables on 200 students. The outcome variable is prog, program type. The predictor variables are social economic status, ses, a three-level categorical variable and writing score, write, a continuous variable.
 #'
